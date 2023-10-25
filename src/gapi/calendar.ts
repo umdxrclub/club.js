@@ -1,5 +1,6 @@
 import { calendar_v3, google } from "googleapis";
 import { getGApiAuthentication } from "./auth";
+import { logger } from "../log";
 
 export type GCalEvent = calendar_v3.Schema$Event;
 export type GCalEventWithId = GCalEvent & {
@@ -20,7 +21,7 @@ function getCalendarClient() {
     return _calendarClient;
 }
 
-export async function createGCalEvent(event: GCalEventNoId, calendarId: string): Promise<calendar_v3.Schema$Event> {
+export async function createGCalEvent(event: GCalEventNoId, calendarId: string): Promise<GCalEvent> {
     let cal = getCalendarClient();
     let response = await cal.events.insert({
         calendarId: calendarId,
@@ -30,7 +31,11 @@ export async function createGCalEvent(event: GCalEventNoId, calendarId: string):
     if (response.status != 200)
         throw new Error("Error while creating calendar event: " + response.statusText)
 
-    return response.data;
+    let createdEvent = response.data;
+
+    logger.info(`Created Google Calendar event ${createdEvent.summary} (${createdEvent.id})`)
+
+    return createdEvent;
 }
 
 export async function editGCalEventWithId(event: GCalEventWithId, calendarId: string): Promise<GCalEvent> {
@@ -44,6 +49,8 @@ export async function editGCalEventWithId(event: GCalEventWithId, calendarId: st
     if (response.status != 200)
         throw new Error("Error while editing calendar event: " + response.statusText)
 
+    logger.info(`Edited Google Calendar event ${event.summary} (${event.id})`)
+
     return response.data;
 }
 
@@ -56,12 +63,14 @@ export async function editGCalEvent(event: GCalEventNoId, calendarId: string, ev
     return await editGCalEventWithId(eventWithId, calendarId)
 }
 
-export function deleteGCalEvent(event: GCalEventWithId | string, calendarId: string) {
+export async function deleteGCalEvent(event: GCalEventWithId | string, calendarId: string) {
     let cal = getCalendarClient();
     let eventId = typeof(event) === "string" ? event : event.id;
 
-    cal.events.delete({
+    await cal.events.delete({
         calendarId: calendarId,
         eventId: eventId
     })
+
+    logger.info(`Deleted Google Calendar event (${eventId})`)
 }

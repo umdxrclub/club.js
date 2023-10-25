@@ -16,8 +16,9 @@ import {
   sendMessage,
   tryFetchChannel,
 } from "../../discord/messages";
-import { ModelExtension, ModelTransformer } from "../../model-manager";
+import { ModelExtension } from "../../model-manager";
 import { BaseEvent } from "../event";
+import { logger } from "../../log";
 
 type GuildEventRecord = {
   guildId: string;
@@ -219,6 +220,8 @@ async function createGuildEvent(event: BaseEvent, guildId: string) {
   let details = await prepareGuildEvent(event, guildId);
   let scheduledEvent = await guild.scheduledEvents.create(details);
 
+  logger.info(`Created guild event "${scheduledEvent.name}" (${scheduledEvent.id})`)
+
   return scheduledEvent;
 }
 
@@ -230,6 +233,8 @@ async function editGuildEvent(
   let scheduledEvent = await fetchGuildEvent(guildId, eventId);
   let details = await prepareGuildEvent(event, guildId);
   let modifiedEvent = await scheduledEvent.edit(details);
+
+  logger.info(`Edited guild event "${modifiedEvent.name}" (${modifiedEvent.id})`)
 
   return modifiedEvent;
 }
@@ -244,6 +249,7 @@ async function fetchGuildEvent(guildId: string, eventId: string) {
 async function removeGuildEvent(guildId: string, eventId: string) {
   let scheduledEvent = await fetchGuildEvent(guildId, eventId);
   await scheduledEvent.delete();
+  logger.info(`Removed guild event "${scheduledEvent.name}" (${scheduledEvent.id})`)
 }
 
 async function removeAllGuildEvents(event: EventWithDiscord) {
@@ -277,6 +283,8 @@ export async function createEventMessage(
   let message = prepareEventMessage(event);
   let sentMessage = await sendMessage(message, channelId);
 
+  logger.info(`Created event message (${sentMessage.id})`)
+
   return sentMessage;
 }
 
@@ -288,6 +296,8 @@ async function editEventMessage(
   let fetchedMessage = await fetchMessage(channelId, messageId);
   let message = prepareEventMessage(event);
   let editedMessage = await fetchedMessage.edit(message);
+
+  logger.info(`Edited event message (${editedMessage.id})`)
 
   return editedMessage;
 }
