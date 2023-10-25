@@ -29,7 +29,7 @@ export type DiscordButton = DiscordBaseButton & (ActionButton | LinkButton);
  * @param buttons The buttons to add to the rows
  * @returns The rows with buttons
  */
-export function createButtonRows(
+export function createButtonComponents(
   buttons: DiscordButton[]
 ): ActionRowBuilder<ButtonBuilder>[] {
   if (buttons.length > 25) {

@@ -1,48 +1,43 @@
 export type Identifiable = {
-    id: string
-}
-export type WithoutIdentifiable<T extends Identifiable> = Omit<T, "id">
-
-export type ModelCreator<T extends Identifiable> = (data: WithoutIdentifiable<T>) => Promise<T>
-export type ModelHandler<T extends Identifiable> = (model: T) => Promise<void>
-export type ModelTransformer<T extends Identifiable> = (model: T, prevModel: T | undefined) => Promise<T>
-
-export interface ModelConfig<T extends Identifiable> {
-    creator: ModelCreator<T>,
-    serializer: ModelHandler<T>
-}
+  id: string;
+};
+export type WithoutIdentifiable<T extends Identifiable> = Omit<T, "id">;
+export type ModelCreator<T extends Identifiable> = (
+  data: WithoutIdentifiable<T>
+) => Promise<T>;
+export type ModelHandler<T extends Identifiable> = (model: T) => Promise<void>;
+export type ModelTransformer<T extends Identifiable> = (
+  model: T,
+  prevModel: T | undefined
+) => Promise<T>;
 
 export interface ModelExtension<T extends Identifiable> {
-    transformer: ModelTransformer<T>,
-    destroyer: ModelHandler<T>
+  transform: ModelTransformer<T>;
+  destroy: ModelHandler<T>;
 }
 
-export class ModelManager<T extends Identifiable> {
-    private _config: ModelConfig<T>
-    private _extensions: ModelExtension<T>[] = []
+export class ModelManager<T extends Identifiable> implements ModelExtension<T> {
+  private _extensions: ModelExtension<T>[] = [];
 
-    constructor(config: ModelConfig<T>) {
-        this._config = config;
-    }
+  public async transform(model: T, prevModel: T | undefined): Promise<T> {
+    let initialPromise: Promise<T> = Promise.resolve(model);
 
-    public async transform(model: T, prevModel: T | undefined): Promise<T> {
-        let initialPromise: Promise<T> = Promise.resolve(model);
+    let transformPromise = this._extensions.reduce(async (p, e) => {
+      let model = await p;
 
-        let transformedModel = this._extensions.reduce(async (p, e) => {
-            let model = await p;
-            let newModelPromise = e.transformer(model, prevModel)
+      let newModelPromise = e.transform(model, prevModel);
 
-            return newModelPromise;
-        }, initialPromise);
+      return newModelPromise;
+    }, initialPromise);
 
-        return transformedModel;
-    }
+    return transformPromise;
+  }
 
-    public async destroy(model: T) {
-        await Promise.all(this._extensions.map(async e => e.destroyer(model)))
-    }
+  public async destroy(model: T) {
+    await Promise.all(this._extensions.map(async (e) => e.destroy(model)));
+  }
 
-    public addExtension(extension: ModelExtension<T>) {
-        this._extensions.push(extension);
-    }
+  public addExtension(extension: ModelExtension<T>) {
+    this._extensions.push(extension);
+  }
 }

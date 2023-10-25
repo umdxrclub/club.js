@@ -5,7 +5,7 @@ export async function sendBulkMessage(channelId: string, messages: DiscordCreata
     let sentMessages: Message[] = []
 
     for (var message of messages) {
-        let sentMessage = await sendMessage(channelId, message);
+        let sentMessage = await sendMessage(message, channelId);
         sentMessages.push(sentMessage);
     }
 
@@ -13,5 +13,5 @@ export async function sendBulkMessage(channelId: string, messages: DiscordCreata
 }
 
 export async function editBulkMessage(channelId: string, messageIds: string[], messages: DiscordEditableMessage[]) {
-    
+
 }

@@ -19,10 +19,16 @@ export type DiscordEditableMessage =
 export type DiscordMessage = DiscordCreatableMessage & DiscordEditableMessage;
 
 export async function fetchChannel(channelId: string): Promise<Channel> {
-  let client = getDiscordClient();
-  
-  let channel = await client.channels.fetch(channelId);
+  let channel = await tryFetchChannel(channelId);
   if (!channel) throw new Error("Channel could not be found!");
+
+  return channel;
+}
+
+export async function tryFetchChannel(channelId: string): Promise<Channel | null> {
+  let client = getDiscordClient();
+
+  let channel = await client.channels.fetch(channelId);
 
   return channel;
 }
@@ -38,8 +44,8 @@ export async function fetchTextChannel(
 }
 
 export async function sendMessage(
-  channelId: string,
-  message: DiscordCreatableMessage
+  message: DiscordCreatableMessage,
+  channelId: string
 ): Promise<Message> {
   let channel = await fetchTextChannel(channelId);
 
@@ -57,9 +63,9 @@ export async function fetchMessage(channelId: string, messageId: string) {
 }
 
 export async function editMessage(
+  message: DiscordEditableMessage,
   channelId: string,
-  messageId: string,
-  message: DiscordEditableMessage
+  messageId: string
 ): Promise<Message> {
   let fetchedMessage = await fetchMessage(channelId, messageId);
   let editedMessage = await fetchedMessage.edit(message);

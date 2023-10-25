@@ -5,9 +5,16 @@
   "license": "MIT",
   "dependencies": {
     "discord.js": "^14.13.0",
-    "typescript": "^5.2.2"
+    "dotenv": "^16.3.1",
+    "googleapis": "^128.0.0",
+    "typescript": "^5.2.2",
+    "vrchat": "^1.15.0"
   },
   "devDependencies": {
+    "payload": "^2.0.12",
     "ts-node": "^10.9.1"
+  },
+  "peerDependencies": {
+    "payload": "^2.0.12"
   }
 }

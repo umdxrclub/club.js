@@ -1,13 +1,16 @@
 import { EmbedBuilder } from "discord.js";
 
-function createQuoteEmbed(): EmbedBuilder {
-    let embed = new EmbedBuilder();
+export function truncate(str: string, maxChars: number, trail: string = "...") {
+  let maxLength = maxChars - trail.length;
 
-    return embed;
+  if (str.length > maxLength) {
+    str = str.substring(0, maxLength) + trail;
+  }
+
+  return str;
 }
 
-function createEventEmbed(): EmbedBuilder {
-    let embed = new EmbedBuilder();
-
-    return embed;
+export function sanitizeEmbed(embed: EmbedBuilder) {
+  if (embed.data.title) embed.setTitle(truncate(embed.data.title, 256))
+  if (embed.data.description) embed.setDescription(truncate(embed.data.description, 4096))
 }

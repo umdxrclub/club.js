@@ -1,12 +1,13 @@
 import { Identifiable, ModelManager } from "../model-manager"
+import { RecurrenceRule } from "./recurrence"
+
 
 export interface BaseEvent extends Identifiable {
     name: string,
     startDate: Date,
     endDate: Date,
-    repeat?: {
-        
-    }
+    repeat?: RecurrenceRule,
+    thumbnail?: string
     description?: string
     location: {
         irl?: string,
