@@ -1,22 +1,22 @@
 import { GCalEventNoId, createGCalEvent, deleteGCalEvent, editGCalEvent } from "../../gapi/calendar";
 import {
     ModelExtension
-} from "../../model-manager";
-import { BaseEvent } from "../event";
+} from "../../util/model-manager";
+import { ClubEventData } from "../event";
 
 type GCalEventRecord = {
   eventId: string;
   calendarId: string;
 };
 
-export interface EventWithGCal extends BaseEvent {
+export interface GCalClubEventData extends ClubEventData {
   gcal: {
-    publishOnGCal: boolean;
-    events: GCalEventRecord[] | undefined;
+    publishOnGCal?: boolean | undefined;
+    events?: GCalEventRecord[] | undefined;
   };
 }
 
-export class GCalEventExtension<T extends EventWithGCal>
+export class GCalEventExtension<T extends GCalClubEventData>
   implements ModelExtension<T>
 {
   private _calendarIds: string[] = [];
@@ -71,7 +71,7 @@ export class GCalEventExtension<T extends EventWithGCal>
   }
 }
 
-function prepareGCalEvent(event: BaseEvent): GCalEventNoId {
+function prepareGCalEvent(event: ClubEventData): GCalEventNoId {
   let calEvent: GCalEventNoId = {
     summary: event.name,
     description: event.description,

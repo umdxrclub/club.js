@@ -1,4 +1,4 @@
-import { Either } from "../types";
+import { Either } from "../util/types";
 
 type Frequency =
   | "SECONDLY"

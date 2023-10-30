@@ -2,18 +2,17 @@ import { ButtonStyle, Client } from "discord.js";
 import { configDotenv } from "dotenv";
 import { setClient } from "../src/discord/bot";
 import { DiscordButton } from "../src/discord/buttons";
-import { Event } from "../src/events/event";
+import { ClubEventData } from "../src/events/event";
 import {
-  DiscordEventExtension,
-  EventWithDiscord,
+  DiscordClubEventData, DiscordClubEventExtension
 } from "../src/events/extensions/discord";
 import {
-  EventWithGCal,
+  GCalClubEventData,
   GCalEventExtension,
 } from "../src/events/extensions/gcal";
-import { ModelManager } from "../src/model-manager";
-import { sleep } from "../src/util";
 import { setGApiAuthentication } from "../src/gapi/auth";
+import { ModelManager } from "../src/util/model-manager";
+import { sleep } from "../src/util/util";
 
 configDotenv();
 
@@ -21,7 +20,7 @@ var client = new Client({
   intents: [],
 });
 
-type MyEvent = Event<EventWithDiscord & EventWithGCal>;
+type MyEvent = ClubEventData & DiscordClubEventData & GCalClubEventData;
 
 client.once("ready", async () => {
   console.log("Logged in as: " + client.user?.displayName);
@@ -42,8 +41,8 @@ client.once("ready", async () => {
     });
   }
 
-  let date = new Date("10-30-2023");
-  let endDate = new Date("10-31-2023");
+  let date = new Date("10-30-2024");
+  let endDate = new Date("10-31-2024");
 
   let event: MyEvent = {
     id: "breh",
@@ -60,10 +59,7 @@ client.once("ready", async () => {
     endDate: endDate,
     isPublished: true,
     discord: {
-      createEmbedMessage: true,
-      createGuildEvent: true,
-      guildEvents: undefined,
-      eventMessages: undefined,
+      color: "#ff0000"
     },
     gcal: {
       publishOnGCal: true,
@@ -71,7 +67,7 @@ client.once("ready", async () => {
     },
   };
 
-  let discord = new DiscordEventExtension<MyEvent>({
+  let discord = new DiscordClubEventExtension<MyEvent>({
     "980181387904684082": "1061318837708009633",
   });
   let gcal = new GCalEventExtension<MyEvent>([

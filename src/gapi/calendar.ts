@@ -1,6 +1,6 @@
 import { calendar_v3, google } from "googleapis";
 import { getGApiAuthentication } from "./auth";
-import { logger } from "../log";
+import { logger } from "../util/log";
 
 export type GCalEvent = calendar_v3.Schema$Event;
 export type GCalEventWithId = GCalEvent & {
